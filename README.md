@@ -1,39 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aduan Publik — Frontend
 
-## Getting Started
+Frontend Next.js untuk [WebInAction-Backend-Laravel](https://github.com/Goldenkwi/WebInAction-Backend-Laravel). Antarmuka berbahasa Indonesia untuk warga, admin verifikator, dan admin instansi.
 
-First, run the development server:
+## Menjalankan secara lokal
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Jalankan Laravel API pada `http://127.0.0.1:8000` dan siapkan database sesuai README backend.
+2. Salin `.env.local.example` menjadi `.env.local`. Ubah `LARAVEL_API_URL` bila backend berjalan di alamat lain.
+3. Jalankan:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   pnpm install
+   pnpm dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Buka `http://localhost:3000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`LARAVEL_API_URL` adalah konfigurasi server Next.js. Jangan menggantinya dengan variabel `NEXT_PUBLIC_*` karena browser tidak perlu dan tidak boleh mengetahui alamat internal backend.
 
-## Learn More
+## Autentikasi dan API
 
-To learn more about Next.js, take a look at the following resources:
+Browser hanya memanggil route same-origin `/api/backend/*`. Route Handler Next.js meneruskan request ke `/api/*` Laravel, menyimpan token Sanctum pada cookie `HttpOnly`, dan tidak mengirim token kembali ke JavaScript. Cookie menggunakan `Secure` saat production. Untuk deployment production, `LARAVEL_API_URL` wajib berupa URL HTTPS.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Format API Laravel `{ success, message, data }`, error validasi `errors`, dan metadata pagination `meta` ditangani oleh `lib/backend.ts`. Sesi dipulihkan dengan `GET /api/auth/me`; keluar memanggil `POST /api/auth/logout`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Halaman yang tersedia
 
-## Deploy on Vercel
+| Halaman | Akses | Fungsi |
+|---|---|---|
+| `/` | Publik | Beranda layanan dan laporan publik terbaru |
+| `/login` | Publik | Login untuk warga/petugas |
+| `/register` | Publik | Registrasi akun warga |
+| `/reports` | Publik | Laporan terverifikasi yang dibagikan publik, dengan filter |
+| `/reports/[id]` | Login | Detail laporan yang dapat diakses dan timeline |
+| `/reports/new` | Warga | Kirim pengaduan/aspirasi, foto, privasi, dan anonimitas |
+| `/my-reports` | Warga | Daftar dan status laporan milik sendiri |
+| `/admin` | Admin | Statistik backend, distribusi status/kategori/prioritas |
+| `/admin/reports` | Admin | Antrean, filter laporan, confidence AI, dan koreksi |
+| `/admin/reports/[id]` | Admin | Verifikasi, penolakan, tindak lanjut, audit trail |
+| `/admin/categories` | Admin | Tambah, ubah, dan hapus kategori |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Registrasi publik selalu membuat role `citizen`; role petugas diberikan oleh backend. Otorisasi di UI membantu navigasi, sedangkan middleware Laravel tetap menjadi sumber otoritas.
+Daftar laporan publik dapat dibuka tanpa login, tetapi route detail backend saat ini tetap memakai `auth:sanctum`; pengguna harus masuk terlebih dahulu untuk melihat detail.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# WebInAction-FrontEnd
-# WebInAction-FrontEnd
-# WebInAction-FrontEnd
+## Akun demo backend
+
+Data akun tersedia setelah seeder backend dijalankan (`php artisan migrate:fresh --seed`):
+
+| Peran | Email | Password |
+|---|---|---|
+| Warga | `warga@example.com` | `password123` |
+| Admin Verifikator | `verifier@example.com` | `password123` |
+| Admin Instansi | `agency@example.com` | `password123` |
+
+## Batasan mengikuti kontrak API
+
+- Pengelompokan topik sentimen, SLA menit, latensi AI live, toggle auto-routing, dan batch approval tidak ditampilkan sebagai fitur aktif karena backend saat ini tidak menyediakan endpoint untuk hal tersebut.
+- Pengiriman laporan menjalankan analisis melalui Laravel; jika AI tidak tersedia, backend tetap menerima laporan untuk verifikasi manual.
+- API belum menyediakan reset password, pembaruan profil, atau pemilihan instansi tujuan secara terpisah.
