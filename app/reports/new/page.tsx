@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import RequireUser from "@/components/RequireUser";
 import PortalLayout from "@/components/PortalLayout";
-import { useTheme } from "@/components/providers/AppProviders";
+import { useAuth, useTheme } from "@/components/providers/AppProviders";
 import Alert from "@/components/ui/Alert";
+import ImageDropzone from "@/components/ui/ImageDropzone";
 import PageHeading from "@/components/ui/PageHeading";
 import Panel from "@/components/ui/Panel";
 import { apiRequest, type Category, type ReportCreationResult } from "@/lib/backend";
@@ -25,10 +25,11 @@ export default function NewReportPage() {
 	const [isPrivate, setIsPrivate] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState("");
-	const [imagePreview, setImagePreview] = useState("");
-	const imagePreviewUrl = useRef("");
+	const [guestSuccess, setGuestSuccess] = useState<ReportCreationResult | null>(null);
 	const router = useRouter();
 	const { isLightTheme } = useTheme();
+	const { user } = useAuth();
+	const isGuest = !user;
 
 	useEffect(() => {
 		let isMounted = true;
@@ -49,25 +50,8 @@ export default function NewReportPage() {
 		};
 	}, []);
 
-	useEffect(
-		() => () => {
-			if (imagePreviewUrl.current) URL.revokeObjectURL(imagePreviewUrl.current);
-		},
-		[],
-	);
-
 	function handleImageChange(file: File | null) {
-		if (imagePreviewUrl.current) {
-			URL.revokeObjectURL(imagePreviewUrl.current);
-			imagePreviewUrl.current = "";
-		}
 		setImage(file);
-		if (file) {
-			imagePreviewUrl.current = URL.createObjectURL(file);
-			setImagePreview(imagePreviewUrl.current);
-		} else {
-			setImagePreview("");
-		}
 	}
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -119,7 +103,12 @@ export default function NewReportPage() {
 				method: "POST",
 				body,
 			});
-			router.push(`/reports/${response.data.id}`);
+			if (isGuest) {
+				// Tamu tidak dapat mengakses halaman detail/history, cukup nomor tiketnya.
+				setGuestSuccess(response.data);
+			} else {
+				router.push(`/reports/${response.data.id}`);
+			}
 		} catch (cause) {
 			setError(
 				cause instanceof Error
@@ -139,23 +128,80 @@ export default function NewReportPage() {
 	const labelClass = "mb-1.5 block text-xs font-medium";
 
 	return (
-		<RequireUser roles={["citizen"]}>
+		<RequireUser roles={["citizen"]} allowGuest>
 			<PortalLayout title="Buat laporan">
-				<PageHeading
-					eyebrow="Layanan masyarakat"
-					title="Sampaikan laporan"
-					description="Berikan informasi yang jelas agar petugas dapat menindaklanjuti dengan tepat."
-					actions={
-						<Link
-							href="/my-reports"
-							className={`rounded-lg border px-3 py-2 text-xs font-medium ${
-								isLightTheme ? "border-slate-200" : "border-white/10"
-							}`}
-						>
-							Kembali ke laporan saya
-						</Link>
-					}
-				/>
+				{guestSuccess ? (
+					<Panel className="mx-auto max-w-xl text-center">
+						<span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-2xl">
+							✅
+						</span>
+						<h2 className="mt-4 text-base font-semibold">
+							Laporan berhasil dikirim
+						</h2>
+						<p className="mt-2 text-xs leading-relaxed text-slate-500">
+							Simpan nomor tiket berikut untuk referensi Anda.
+						</p>
+						<p className="mt-3 inline-block rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm font-bold tracking-wide text-indigo-500">
+							{guestSuccess.ticket_number}
+						</p>
+						<p className="mt-4 text-xs leading-relaxed text-slate-500">
+							Anda mengirim laporan ini tanpa akun, sehingga riwayat dan status
+							laporan hanya dapat diakses setelah masuk atau mendaftar sebagai
+							warga terdaftar.
+						</p>
+						<div className="mt-6 flex flex-wrap justify-center gap-2">
+							<button
+								type="button"
+								onClick={() => {
+									setGuestSuccess(null);
+									setError("");
+								}}
+								className={`rounded-lg border px-4 py-2.5 text-xs font-medium ${
+									isLightTheme ? "border-slate-200" : "border-white/10"
+								}`}
+							>
+								Kirim laporan lain
+							</button>
+							<Link
+								href="/login"
+								className="rounded-lg bg-indigo-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-600"
+							>
+								Masuk untuk melacak laporan
+							</Link>
+							<Link
+								href="/register"
+								className="rounded-lg border border-indigo-500/30 px-4 py-2.5 text-xs font-semibold text-indigo-500 hover:bg-indigo-500/10"
+							>
+								Buat akun warga
+							</Link>
+						</div>
+					</Panel>
+				) : (
+					<>
+						<PageHeading
+							eyebrow="Layanan masyarakat"
+							title="Sampaikan laporan"
+							description="Berikan informasi yang jelas agar petugas dapat menindaklanjuti dengan tepat."
+							actions={
+								isGuest ? undefined : (
+									<Link
+										href="/my-reports"
+										className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+											isLightTheme ? "border-slate-200" : "border-white/10"
+										}`}
+									>
+										Kembali ke laporan saya
+									</Link>
+								)
+							}
+						/>
+
+						{isGuest && (
+							<Alert
+								type="info"
+								message="Anda mengirim laporan sebagai tamu tanpa akun. Laporan tetap diproses oleh petugas, namun akses ke laporan publik dan riwayat laporan hanya tersedia bagi pengguna terdaftar."
+							/>
+						)}
 
 				<div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
 					<Panel>
@@ -274,32 +320,12 @@ export default function NewReportPage() {
 
 							<label className="block">
 								<span className={labelClass}>Foto pendukung (opsional)</span>
-								<input
-									type="file"
-									accept="image/jpeg,image/png,image/webp"
-									onChange={(event) => handleImageChange(event.target.files?.[0] ?? null)}
-									className={`block w-full rounded-lg border px-3 py-2 text-xs file:mr-3 file:rounded-md file:border-0 file:bg-indigo-500/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-500 ${
-										isLightTheme
-											? "border-slate-200 bg-white"
-											: "border-white/10 bg-slate-950/40"
-									}`}
+								<ImageDropzone
+									className="mt-1"
+									value={image}
+									onChange={handleImageChange}
+									label="Foto laporan"
 								/>
-								<span className="mt-1 block text-[10px] text-slate-500">
-									JPG, PNG, atau WEBP · maksimal 2 MB
-								</span>
-								{imagePreview && (
-									<div className="mt-3">
-										{/* Local preview only; the uploaded image URL comes from the API. */}
-										<Image
-											src={imagePreview}
-											width={720}
-											height={480}
-											unoptimized
-											alt="Pratinjau foto laporan"
-											className="max-h-56 rounded-lg border border-white/10 object-contain"
-										/>
-									</div>
-								)}
 							</label>
 
 							<div className={`space-y-3 rounded-lg border p-3 ${
@@ -338,7 +364,7 @@ export default function NewReportPage() {
 							{error && <Alert message={error} />}
 							<div className="flex flex-wrap justify-end gap-2">
 								<Link
-									href="/my-reports"
+									href={isGuest ? "/" : "/my-reports"}
 									className={`rounded-lg border px-4 py-2.5 text-xs font-medium ${
 										isLightTheme ? "border-slate-200" : "border-white/10"
 									}`}
@@ -368,6 +394,8 @@ export default function NewReportPage() {
 						</ul>
 					</aside>
 				</div>
+					</>
+				)}
 			</PortalLayout>
 		</RequireUser>
 	);

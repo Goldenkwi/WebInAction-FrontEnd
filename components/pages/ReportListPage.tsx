@@ -33,8 +33,7 @@ export default function ReportListPage(config: ListConfig) {
 	const params = useSearchParams();
 	const searchParam = params.get("search") ?? "";
 
-	// `key` membuat komponen di-remount saat kata kunci URL berubah, sehingga
-	// pencarian dari Header ikut terpakai tanpa setState di dalam effect.
+
 	return (
 		<ReportListContent key={searchParam} {...config} initialSearch={searchParam} />
 	);
@@ -74,7 +73,6 @@ function ReportListContent({
 	}, []);
 
 	useEffect(() => {
-		// Endpoint "reports/my" butuh sesi; tunggu auth siap agar tidak 401.
 		if (endpoint === "reports/my" && !user) return;
 		const controller = new AbortController();
 		const query = toQueryString({
@@ -271,5 +269,6 @@ function ReportListContent({
 	if (requireCitizen) {
 		return <RequireUser roles={["citizen"]}>{content}</RequireUser>;
 	}
-	return content;
+	// Laporan publik bukan halaman bebas: pengguna tanpa akun diarahkan ke login.
+	return <RequireUser>{content}</RequireUser>;
 }

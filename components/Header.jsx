@@ -63,7 +63,7 @@ function Icon({
 }
 
 export default function Header({
-	title = "Portal Aduan",
+	title = "LaporKu",
 	onMenuClick = () => {},
 	showMenuButton = false,
 }) {
@@ -73,7 +73,7 @@ export default function Header({
 	const [search, setSearch] = useState("");
 	const [logoutError, setLogoutError] = useState("");
 	const router = useRouter();
-	const displayName = user?.name ?? "Pengunjung";
+	const displayName = user?.name ?? "Guest";
 	const initial = displayName.trim().charAt(0).toUpperCase() || "P";
 
 	function handleSearch(event) {
@@ -125,7 +125,7 @@ export default function Header({
 							isLightTheme ? "text-slate-400" : "text-slate-500"
 						}`}
 					>
-						Disposisi Aduan Publik
+						Aduan Publik Berbasis AI
 					</p>
 					<h1 className="truncate text-sm font-semibold sm:text-base">{title}</h1>
 				</div>

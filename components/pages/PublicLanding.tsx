@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
-import { useTheme } from "@/components/providers/AppProviders";
+import { useAuth, useTheme } from "@/components/providers/AppProviders";
 import ReportCard from "@/components/ui/ReportCard";
 import { apiRequest, type Report } from "@/lib/backend";
 
@@ -12,8 +12,15 @@ export default function PublicLanding() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 	const { isLightTheme } = useTheme();
+	const { user, isLoading: isAuthLoading } = useAuth();
+	const isGuest = !user && !isAuthLoading;
 
 	useEffect(() => {
+		if (!user) {
+			// Pengguna tidak terdaftar: laporan publik dibatasi, jangan muat pratinjau.
+			setIsLoading(false);
+			return;
+		}
 		let isMounted = true;
 		apiRequest<Report[]>("reports/public?per_page=3")
 			.then((response) => {
@@ -33,7 +40,7 @@ export default function PublicLanding() {
 		return () => {
 			isMounted = false;
 		};
-	}, []);
+	}, [user]);
 
 	return (
 		<div
@@ -43,13 +50,13 @@ export default function PublicLanding() {
 					: "bg-[#080d18] text-slate-100"
 			}`}
 		>
-			<Header title="Portal Aduan Masyarakat" />
+			<Header title="LaporKu" />
 			<main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
 				<section className="relative overflow-hidden py-16 sm:py-24">
 					<div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
 					<div className="relative max-w-3xl">
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">
-							Portal pelaporan masyarakat
+							Selamat datang di LaporKu
 						</p>
 						<h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
 							Suara Anda membantu{" "}
@@ -73,14 +80,14 @@ export default function PublicLanding() {
 								Buat laporan
 							</Link>
 							<Link
-								href="/reports"
+								href={isGuest ? "/login" : "/reports"}
 								className={`rounded-lg border px-5 py-3 text-sm font-semibold transition ${
 									isLightTheme
 										? "border-slate-200 hover:bg-white"
 										: "border-white/10 hover:bg-white/5"
 								}`}
 							>
-								Lihat laporan publik
+								{isGuest ? "Masuk untuk lihat laporan publik" : "Lihat laporan publik"}
 							</Link>
 						</div>
 						<div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs text-slate-500">
@@ -129,29 +136,59 @@ export default function PublicLanding() {
 							</p>
 							<h2 className="mt-1 text-xl font-semibold">Laporan terbaru</h2>
 						</div>
-						<Link href="/reports" className="text-xs font-semibold text-indigo-500 hover:text-indigo-400">
-							Lihat semua laporan →
-						</Link>
+						{user && (
+							<Link href="/reports" className="text-xs font-semibold text-indigo-500 hover:text-indigo-400">
+								Lihat semua laporan →
+							</Link>
+						)}
 					</div>
-					{isLoading && (
-						<p className="py-10 text-center text-sm text-slate-500">Memuat laporan publik...</p>
-					)}
-					{error && (
-						<div role="alert" className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs text-rose-500">
-							{error}
-						</div>
-					)}
-					{!isLoading && !error && reports.length === 0 && (
+					{isGuest ? (
 						<div className={`rounded-xl border p-8 text-center text-sm text-slate-500 ${
 							isLightTheme ? "border-slate-200 bg-white" : "border-white/[0.06] bg-[#101827]"
 						}`}>
-							Belum ada laporan yang dipublikasikan.
+							<p>
+								Laporan publik hanya dapat diakses oleh pengguna terdaftar.
+							</p>
+							<div className="mt-4 flex flex-wrap justify-center gap-2">
+								<Link
+									href="/login"
+									className="rounded-lg bg-indigo-500 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-600"
+								>
+									Masuk
+								</Link>
+								<Link
+									href="/register"
+									className={`rounded-lg border px-4 py-2 text-xs font-semibold text-indigo-500 hover:bg-indigo-500/10 ${
+										isLightTheme ? "border-indigo-200" : "border-indigo-500/30"
+									}`}
+								>
+									Buat akun warga
+								</Link>
+							</div>
 						</div>
-					)}
-					{reports.length > 0 && (
-						<div className="grid gap-3 lg:grid-cols-3">
-							{reports.map((report) => <ReportCard key={report.id} report={report} />)}
-						</div>
+					) : (
+						<>
+							{isLoading && (
+								<p className="py-10 text-center text-sm text-slate-500">Memuat laporan publik...</p>
+							)}
+							{error && (
+								<div role="alert" className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs text-rose-500">
+									{error}
+								</div>
+							)}
+							{!isLoading && !error && reports.length === 0 && (
+								<div className={`rounded-xl border p-8 text-center text-sm text-slate-500 ${
+									isLightTheme ? "border-slate-200 bg-white" : "border-white/[0.06] bg-[#101827]"
+								}`}>
+									Belum ada laporan yang dipublikasikan.
+								</div>
+							)}
+							{reports.length > 0 && (
+								<div className="grid gap-3 lg:grid-cols-3">
+									{reports.map((report) => <ReportCard key={report.id} report={report} />)}
+								</div>
+							)}
+						</>
 					)}
 				</section>
 				<footer className="mt-16 border-t border-white/[0.06] pt-5 text-xs text-slate-500">

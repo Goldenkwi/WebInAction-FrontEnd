@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aduan Publik — Disposisi Berbasis AI",
-    template: "%s | Aduan Publik",
+    default: "LaporKu",
+    template: "%s | LaporKu",
   },
   description:
     "Portal pelaporan masyarakat untuk mengirim, memantau, dan menindaklanjuti aduan publik.",
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      data-theme="dark"
+      data-theme="light"
     >
       <body className="min-h-full">
         <AppProviders>{children}</AppProviders>

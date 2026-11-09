@@ -49,8 +49,7 @@ export default function AdminReportsPage() {
 	}, []);
 
 	useEffect(() => {
-		// Antrean hanya untuk petugas; tunggu sesi siap agar tidak memicu 401/403
-		// palsu sebelum RequireUser melakukan pengecekan.
+
 		if (!user || user.role === "citizen") return;
 		const controller = new AbortController();
 		const query = toQueryString({
@@ -112,7 +111,7 @@ export default function AdminReportsPage() {
 	}
 
 	return (
-		<RequireUser roles={["verifier_admin", "agency_admin"]}>
+		<RequireUser roles={["verifier_admin", "agency_admin", "super_admin"]}>
 			<PortalLayout title="Antrean laporan">
 				<PageHeading
 					eyebrow="Ruang kerja petugas"

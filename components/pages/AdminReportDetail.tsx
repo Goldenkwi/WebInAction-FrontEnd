@@ -128,7 +128,7 @@ export default function AdminReportDetailPage({ id }: { id: string }) {
 	const noteLabelClass = "mb-1.5 block text-[11px] font-medium";
 
 	return (
-		<RequireUser roles={["verifier_admin", "agency_admin"]}>
+		<RequireUser roles={["verifier_admin", "agency_admin", "super_admin"]}>
 			<PortalLayout title="Tinjau laporan">
 				{isLoading ? (
 					<Panel><LoadingState label="Memuat laporan..." /></Panel>

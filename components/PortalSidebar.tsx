@@ -10,6 +10,20 @@ const citizenLinks = [
 	{ href: "/reports", label: "Laporan publik" },
 ];
 
+const guestLinks = [
+	{ href: "/reports/new", label: "Buat laporan" },
+	{ href: "/login", label: "Masuk" },
+	{ href: "/register", label: "Buat akun warga" },
+];
+
+const superAdminLinks = [
+	{ href: "/admin", label: "Ringkasan" },
+	{ href: "/admin/reports", label: "Verifikasi laporan" },
+	{ href: "/admin/agencies", label: "Manajemen instansi" },
+	{ href: "/admin/categories", label: "Kategori laporan" },
+	{ href: "/reports", label: "Laporan publik" },
+];
+
 const verifierLinks = [
 	{ href: "/admin", label: "Ringkasan" },
 	{ href: "/admin/reports", label: "Verifikasi laporan" },
@@ -33,11 +47,15 @@ export default function PortalSidebar({
 	const pathname = usePathname();
 	const { user } = useAuth();
 	const { isLightTheme } = useTheme();
-	const links = user?.role === "verifier_admin"
-		? verifierLinks
-		: user?.role === "agency_admin"
-			? agencyLinks
-			: citizenLinks;
+	const links = !user
+		? guestLinks
+		: user.role === "super_admin"
+			? superAdminLinks
+			: user.role === "verifier_admin"
+				? verifierLinks
+				: user.role === "agency_admin"
+					? agencyLinks
+					: citizenLinks;
 
 	return (
 		<>
@@ -83,7 +101,7 @@ export default function PortalSidebar({
 								isLightTheme ? "text-slate-400" : "text-slate-500"
 							}`}
 						>
-							Disposisi berbasis AI
+							Aduan Publik Berbasis AI
 						</span>
 					</span>
 				</Link>

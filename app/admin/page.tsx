@@ -14,11 +14,7 @@ import { apiRequest, type DashboardStats, type Report } from "@/lib/backend";
 
 type PriorityStat = DashboardStats["by_priority"][number];
 
-/**
- * Sebagian respons backend mengirim `by_priority` sebagai object ber-key
- * prioritas ({"darurat": {...}}) alih-alih array. Normalisasi di sini supaya
- * render tidak gagal saat `.map()` dipanggil.
- */
+
 function normalizePriorityStats(value: unknown): PriorityStat[] {
 	if (Array.isArray(value)) return value as PriorityStat[];
 	return Object.values((value as Record<string, PriorityStat> | null) ?? {});
@@ -33,8 +29,7 @@ export default function AdminDashboardPage() {
 	const { user } = useAuth();
 
 	useEffect(() => {
-		// Tunggu sesi petugas siap: mencegah request 401/403 sebelum RequireUser
-		// selesai memeriksa, yang tadinya memicu pesan "Sesi Anda berakhir".
+
 		if (!user || user.role === "citizen") return;
 		let isMounted = true;
 		Promise.all([
@@ -77,7 +72,7 @@ export default function AdminDashboardPage() {
 		: [];
 
 	return (
-		<RequireUser roles={["verifier_admin", "agency_admin"]}>
+		<RequireUser roles={["verifier_admin", "agency_admin", "super_admin"]}>
 			<PortalLayout title="Ringkasan petugas">
 				<PageHeading
 					eyebrow="Pusat kendali petugas"

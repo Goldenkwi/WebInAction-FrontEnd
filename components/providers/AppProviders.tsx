@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, apiRequest, type User } from "@/lib/backend";
+import Toaster from "@/components/ui/Toaster";
 
 type AuthContextValue = {
 	user: User | null;
@@ -33,7 +34,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [theme, setTheme] = useState<"dark" | "light">("dark");
+	const [theme, setTheme] = useState<"dark" | "light">("light");
 	const router = useRouter();
 
 	const refreshUser = useCallback(async () => {
@@ -111,8 +112,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 		}
 		setUser(null);
 		setError(null);
-		// Navigasi penuh (bukan router.replace) supaya RequireUser di halaman
-		// terproteksi tidak sempat me-redirect ke /login?next=... lebih dulu.
+
 		window.location.assign(redirectTo);
 	}, [user]);
 
@@ -137,6 +137,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 		<AuthContext.Provider value={authValue}>
 			<ThemeContext.Provider value={themeValue}>
 				{children}
+				<Toaster />
 			</ThemeContext.Provider>
 		</AuthContext.Provider>
 	);

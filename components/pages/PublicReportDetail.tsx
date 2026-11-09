@@ -19,7 +19,6 @@ export default function ReportDetailPage({ id }: { id: string }) {
 	const { isLightTheme } = useTheme();
 
 	useEffect(() => {
-		// Detail laporan butuh sesi (backend: auth:sanctum). Tunggu sesi siap.
 		if (!user) return;
 		const controller = new AbortController();
 		apiRequest<Report>(`reports/${encodeURIComponent(id)}`, {

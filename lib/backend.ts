@@ -1,4 +1,8 @@
-export type UserRole = "citizen" | "verifier_admin" | "agency_admin";
+export type UserRole =
+	| "citizen"
+	| "verifier_admin"
+	| "agency_admin"
+	| "super_admin";
 
 export interface User {
 	id: number;
@@ -14,6 +18,49 @@ export interface Category {
 	name: string;
 	icon: string | null;
 	reports_count?: number;
+}
+
+export interface Agency {
+	id: number;
+	name: string;
+	code: string | null;
+	city: string | null;
+	address: string | null;
+	phone: string | null;
+	email: string | null;
+	photo_url: string | null;
+	reports_count?: number;
+	created_at?: string;
+}
+
+export interface AgencyPayload {
+	name: string;
+	code?: string | null;
+	city?: string | null;
+	address?: string | null;
+	phone?: string | null;
+	email?: string | null;
+	photo?: File | null;
+}
+
+/** Format & batas ukuran foto instansi (dipakai bersama oleh dropzone dan validasi form). */
+export const AGENCY_PHOTO_MAX_SIZE_MB = 2;
+export const AGENCY_PHOTO_ACCEPTED_TYPES = [
+	"image/jpeg",
+	"image/png",
+	"image/webp",
+] as const;
+
+export function agencyFormData(payload: AgencyPayload): FormData {
+	const body = new FormData();
+	body.set("name", payload.name.trim());
+	if (payload.code?.trim()) body.set("code", payload.code.trim());
+	if (payload.city?.trim()) body.set("city", payload.city.trim());
+	if (payload.address?.trim()) body.set("address", payload.address.trim());
+	if (payload.phone?.trim()) body.set("phone", payload.phone.trim());
+	if (payload.email?.trim()) body.set("email", payload.email.trim());
+	if (payload.photo) body.set("photo", payload.photo);
+	return body;
 }
 
 export type ReportStatus = "pending" | "verified" | "followed_up" | "rejected";
