@@ -57,6 +57,15 @@ export default function PortalSidebar({
 					? agencyLinks
 					: citizenLinks;
 
+
+	const activeHref = links
+		.filter(
+			(item) =>
+				pathname === item.href ||
+				(item.href !== "/" && pathname.startsWith(`${item.href}/`)),
+		)
+		.sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
 	return (
 		<>
 			{isOpen && (
@@ -115,21 +124,19 @@ export default function PortalSidebar({
 				</p>
 				<nav aria-label="Navigasi utama" className="space-y-1">
 					{links.map((item) => {
-						const active =
-							pathname === item.href ||
-							(item.href !== "/" && pathname.startsWith(`${item.href}/`));
+						const active = item.href === activeHref;
 						return (
 							<Link
 								key={item.href}
 								href={item.href}
 								onClick={onNavigate}
 								aria-current={active ? "page" : undefined}
-								className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition ${
+								className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium ${
 									active
 										? "bg-indigo-500/10 text-indigo-500"
 										: isLightTheme
-											? "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-											: "text-slate-400 hover:bg-white/5 hover:text-slate-100"
+											? "text-slate-500"
+											: "text-slate-400"
 								}`}
 							>
 								<span
