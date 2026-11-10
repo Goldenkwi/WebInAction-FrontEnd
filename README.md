@@ -1,6 +1,6 @@
 # Aduan Publik — Frontend
 
-Frontend Next.js untuk [WebInAction-Backend-Laravel](https://github.com/Goldenkwi/WebInAction-Backend-Laravel). Antarmuka berbahasa Indonesia untuk warga, admin verifikator, dan admin instansi.
+Frontend Next.js untuk [WebInAction-Backend-Laravel](https://github.com/Goldenkwi/WebInAction-Backend-Laravel). Antarmuka berbahasa Indonesia untuk warga, admin verifikator, admin instansi, dan super admin.
 
 ## Menjalankan secara lokal
 
@@ -35,11 +35,13 @@ Format API Laravel `{ success, message, data }`, error validasi `errors`, dan me
 | `/reports/new` | Warga | Kirim pengaduan/aspirasi, foto, privasi, dan anonimitas |
 | `/my-reports` | Warga | Daftar dan status laporan milik sendiri |
 | `/admin` | Admin | Statistik backend, distribusi status/kategori/prioritas |
-| `/admin/reports` | Admin | Antrean, filter laporan, confidence AI, dan koreksi |
-| `/admin/reports/[id]` | Admin | Verifikasi, penolakan, tindak lanjut, audit trail |
-| `/admin/categories` | Admin | Tambah, ubah, dan hapus kategori |
+| `/admin/reports` | Verifier, Admin Instansi, Super Admin | Antrean, filter laporan, confidence AI, dan koreksi |
+| `/admin/reports/[id]` | Verifier, Admin Instansi, Super Admin | Verifikasi, penolakan, tindak lanjut, audit trail (tombol menyesuaikan peran) |
+| `/admin/agencies` | Super Admin | Tambah, ubah, dan hapus instansi |
+| `/admin/contacts` | Super Admin | Direktori kontak admin tiap instansi |
+| `/admin/categories` | Super Admin | Tambah, ubah, dan hapus kategori |
 
-Registrasi publik selalu membuat role `citizen`; role petugas diberikan oleh backend. Otorisasi di UI membantu navigasi, sedangkan middleware Laravel tetap menjadi sumber otoritas.
+Registrasi publik selalu membuat role `citizen`; role petugas diberikan oleh backend. Pembagian wewenang mengikuti policy backend: super admin berwenang penuh (via `Gate::before`), admin verifikator hanya memverifikasi dan menolak laporan, sedangkan admin instansi hanya menindaklanjuti laporan instansinya. Otorisasi di UI membantu navigasi, sedangkan policy Laravel tetap menjadi sumber otoritas.
 Daftar laporan publik dapat dibuka tanpa login, tetapi route detail backend saat ini tetap memakai `auth:sanctum`; pengguna harus masuk terlebih dahulu untuk melihat detail.
 
 ## Akun demo backend
@@ -49,8 +51,11 @@ Data akun tersedia setelah seeder backend dijalankan (`php artisan migrate:fresh
 | Peran | Email | Password |
 |---|---|---|
 | Warga | `warga@example.com` | `password123` |
-| Admin Verifikator | `verifier@example.com` | `password123` |
+| Super Admin | `superadmin@example.com` | `password123` |
+| Verifier | `verifier@example.com` | `password123` |
 | Admin Instansi | `agency@example.com` | `password123` |
+
+Super Admin berwenang penuh atas seluruh sistem. Verifier hanya memverifikasi dan menolak laporan. Admin Instansi hanya menindaklanjuti laporan yang ditugaskan ke instansinya. Keempat akun disiapkan oleh `UserSeeder` di backend (`php artisan db:seed --class=UserSeeder`).
 
 ## Batasan mengikuti kontrak API
 

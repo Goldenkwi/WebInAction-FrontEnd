@@ -52,9 +52,8 @@ export default function PublicLanding() {
 		>
 			<Header title="LaporKu" />
 			<main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-				<section className="relative overflow-hidden py-16 sm:py-24">
-					<div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
-					<div className="relative max-w-3xl">
+				<section className="relative py-16 sm:py-24">
+					<div className="max-w-3xl">
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">
 							Selamat datang di LaporKu
 						</p>

@@ -137,7 +137,7 @@ export default function AdminCategoriesPage() {
 	}`;
 
 	return (
-		<RequireUser roles={["verifier_admin", "agency_admin", "super_admin"]}>
+		<RequireUser roles={["super_admin"]}>
 			<PortalLayout title="Kategori laporan">
 				<PageHeading
 					eyebrow="Pengaturan sistem"

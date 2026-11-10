@@ -18,8 +18,9 @@ const guestLinks = [
 
 const superAdminLinks = [
 	{ href: "/admin", label: "Ringkasan" },
-	{ href: "/admin/reports", label: "Verifikasi laporan" },
+	{ href: "/admin/reports", label: "Verifikasi & tindak lanjut" },
 	{ href: "/admin/agencies", label: "Manajemen instansi" },
+	{ href: "/admin/contacts", label: "Kontak instansi" },
 	{ href: "/admin/categories", label: "Kategori laporan" },
 	{ href: "/reports", label: "Laporan publik" },
 ];
@@ -27,7 +28,6 @@ const superAdminLinks = [
 const verifierLinks = [
 	{ href: "/admin", label: "Ringkasan" },
 	{ href: "/admin/reports", label: "Verifikasi laporan" },
-	{ href: "/admin/categories", label: "Kategori laporan" },
 	{ href: "/reports", label: "Laporan publik" },
 ];
 

@@ -126,6 +126,11 @@ export default function AdminReportDetailPage({ id }: { id: string }) {
 			: "border-white/10 bg-slate-950/40"
 	}`;
 	const noteLabelClass = "mb-1.5 block text-[11px] font-medium";
+	// Pemisahan wewenang sesuai policy backend: admin verifikator hanya
+	// memverifikasi/menolak, admin instansi hanya menindaklanjuti laporan
+	// instansinya, super admin berwenang melakukan semuanya.
+	const canVerify = user?.role === "verifier_admin" || user?.role === "super_admin";
+	const canFollowUp = user?.role === "agency_admin" || user?.role === "super_admin";
 
 	return (
 		<RequireUser roles={["verifier_admin", "agency_admin", "super_admin"]}>
@@ -273,7 +278,7 @@ export default function AdminReportDetailPage({ id }: { id: string }) {
 							</div>
 
 							<div className="space-y-4">
-								{report.status === "pending" && (
+								{report.status === "pending" && canVerify && (
 									<>
 										<Panel>
 											<h2 className="text-sm font-semibold">Verifikasi & disposisi</h2>
@@ -348,7 +353,17 @@ export default function AdminReportDetailPage({ id }: { id: string }) {
 									</>
 								)}
 
-								{report.status === "verified" && (
+								{report.status === "pending" && !canVerify && (
+									<Panel>
+										<h2 className="text-sm font-semibold">Menunggu verifikasi</h2>
+										<p className="mt-1 text-[11px] text-slate-500">
+											Laporan masih menunggu verifikasi dari admin verifikator.
+											Tindak lanjut dapat dicatat setelah laporan terverifikasi.
+										</p>
+									</Panel>
+								)}
+
+								{report.status === "verified" && canFollowUp && (
 									<Panel>
 										<h2 className="text-sm font-semibold">Catat tindak lanjut</h2>
 										<p className="mt-1 text-[10px] text-slate-500">
@@ -385,6 +400,16 @@ export default function AdminReportDetailPage({ id }: { id: string }) {
 												{isSubmitting ? "Menyimpan..." : "Simpan tindak lanjut"}
 											</button>
 										</form>
+									</Panel>
+								)}
+
+								{report.status === "verified" && !canFollowUp && (
+									<Panel>
+										<h2 className="text-sm font-semibold">Tindak lanjut oleh instansi</h2>
+										<p className="mt-1 text-[11px] text-slate-500">
+											Laporan sudah terverifikasi. Pencatatan tindak lanjut
+											dikerjakan oleh admin instansi penerima atau super admin.
+										</p>
 									</Panel>
 								)}
 

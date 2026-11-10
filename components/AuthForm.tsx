@@ -276,7 +276,8 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
 					<div className="mt-2 grid gap-2 text-[11px] sm:grid-cols-2">
 						{[
 							["Warga", "warga@example.com"],
-							["Verifikator", "verifier@example.com"],
+							["Super Admin", "superadmin@example.com"],
+							["verifier", "verifier@example.com"],
 							["Admin instansi", "agency@example.com"],
 						].map(([label, demoEmail]) => (
 							<button
@@ -298,7 +299,9 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
 						))}
 					</div>
 					<p className="mt-2 text-[10px] text-slate-500">
-						Klik akun untuk mengisi email dan password demo.
+						Klik akun untuk mengisi email dan password demo. Super Admin
+						berwenang penuh; verifier hanya memverifikasi laporan; admin
+						instansi hanya menindaklanjuti laporannya.
 					</p>
 				</div>
 			)}

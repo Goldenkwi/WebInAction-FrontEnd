@@ -1,7 +1,10 @@
 export type UserRole =
 	| "citizen"
+	/** Verifier: hanya memverifikasi dan menolak laporan (lihat ReportPolicy). */
 	| "verifier_admin"
+	/** Admin instansi: hanya menindaklanjuti laporan instansinya sendiri. */
 	| "agency_admin"
+	/** Super admin: role terpisah dengan akses penuh (Gate::before di backend). */
 	| "super_admin";
 
 export interface User {
@@ -23,12 +26,22 @@ export interface Category {
 export interface Agency {
 	id: number;
 	name: string;
+	acronym?: string | null;
 	code: string | null;
+	description?: string | null;
 	city: string | null;
 	address: string | null;
+	/** Kontak resmi instansi (field kanonik backend). */
+	contact_phone?: string | null;
+	contact_email?: string | null;
+	/** Alias kompatibilitas yang dikirim backend. */
 	phone: string | null;
 	email: string | null;
 	photo_url: string | null;
+	sla_days?: number | null;
+	is_active?: boolean;
+	/** Jumlah akun petugas yang tergabung di instansi (hasil withCount). */
+	users_count?: number;
 	reports_count?: number;
 	created_at?: string;
 }
