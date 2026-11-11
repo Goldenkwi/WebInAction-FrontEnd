@@ -42,7 +42,7 @@ Format API Laravel `{ success, message, data }`, error validasi `errors`, dan me
 | `/admin/categories` | Super Admin | Tambah, ubah, dan hapus kategori |
 
 Registrasi publik selalu membuat role `citizen`; role petugas diberikan oleh backend. Pembagian wewenang mengikuti policy backend: super admin berwenang penuh (via `Gate::before`), admin verifikator hanya memverifikasi dan menolak laporan, sedangkan admin instansi hanya menindaklanjuti laporan instansinya. Otorisasi di UI membantu navigasi, sedangkan policy Laravel tetap menjadi sumber otoritas.
-Daftar laporan publik dapat dibuka tanpa login, tetapi route detail backend saat ini tetap memakai `auth:sanctum`; pengguna harus masuk terlebih dahulu untuk melihat detail.
+Daftar dan detail laporan publik dapat dibuka tanpa login. Laporan privat atau yang masih menunggu verifikasi hanya dapat dilihat pemilik atau petugas setelah masuk.
 
 ## Akun demo backend
 

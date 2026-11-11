@@ -145,9 +145,9 @@ export default function NewReportPage() {
 							{guestSuccess.ticket_number}
 						</p>
 						<p className="mt-4 text-xs leading-relaxed text-slate-500">
-							Anda mengirim laporan ini tanpa akun, sehingga riwayat dan status
-							laporan hanya dapat diakses setelah masuk atau mendaftar sebagai
-							warga terdaftar.
+							Anda mengirim laporan ini tanpa akun. Laporan publik tetap dapat
+							dilihat tanpa masuk, tetapi untuk melacak riwayat dan status
+							laporan ini Anda perlu masuk atau mendaftar sebagai warga.
 						</p>
 						<div className="mt-6 flex flex-wrap justify-center gap-2">
 							<button
@@ -199,7 +199,7 @@ export default function NewReportPage() {
 						{isGuest && (
 							<Alert
 								type="info"
-								message="Anda mengirim laporan sebagai tamu tanpa akun. Laporan tetap diproses oleh petugas, namun akses ke laporan publik dan riwayat laporan hanya tersedia bagi pengguna terdaftar."
+								message="Anda mengirim laporan sebagai tamu tanpa akun. Laporan tetap diproses oleh petugas. Laporan publik dapat dilihat tanpa masuk; masuk atau daftar diperlukan untuk melacak riwayat dan status laporan Anda."
 							/>
 						)}
 
