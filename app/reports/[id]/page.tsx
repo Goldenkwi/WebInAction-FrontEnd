@@ -8,7 +8,7 @@ export default function ReportDetailRoute({
 	return (
 		<Suspense fallback={<main className="min-h-screen bg-background" />}>
 			{params.then(({ id }) => (
-				<RequireUser>
+				<RequireUser allowGuest>
 					<PublicReportDetail id={id} />
 				</RequireUser>
 			))}

@@ -269,6 +269,6 @@ function ReportListContent({
 	if (requireCitizen) {
 		return <RequireUser roles={["citizen"]}>{content}</RequireUser>;
 	}
-	// Laporan publik bukan halaman bebas: pengguna tanpa akun diarahkan ke login.
-	return <RequireUser>{content}</RequireUser>;
+	// BR-03/FR-REP-05: laporan publik harus bisa dibaca tanpa login.
+	return <RequireUser allowGuest>{content}</RequireUser>;
 }

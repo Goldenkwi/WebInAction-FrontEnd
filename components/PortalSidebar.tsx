@@ -11,6 +11,7 @@ const citizenLinks = [
 ];
 
 const guestLinks = [
+	{ href: "/reports", label: "Laporan publik" },
 	{ href: "/reports/new", label: "Buat laporan" },
 	{ href: "/login", label: "Masuk" },
 	{ href: "/register", label: "Buat akun warga" },
